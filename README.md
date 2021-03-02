@@ -12,4 +12,4 @@ Implementing academic literature on solving software engineering problems with m
 
 ## Authors
 
-* Mingu Kang - [Github](
+* Mingu Kang - [Github](https://github.com/minqukanq)
