@@ -3,7 +3,7 @@ Implementing academic literature on solving software engineering problems with m
 
 ## Table of Contents
 * Software visualization and deep transfer learning for effective software defect prediction [[paper]](https://dl.acm.org/doi/abs/10.1145/3377811.3380389)
-* 
+
 
 ## Build With
 
