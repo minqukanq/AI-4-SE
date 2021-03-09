@@ -157,7 +157,8 @@ def image_classification_test(loader, model, test_10crop=True, gpu=True):
     return accuracy, F
 
 # CenterLoss
-lmcl_loss = model_utils.LMCL_loss(num_classes=2, feat_dim=2).cuda()
+# lmcl_loss = model_utils.LMCL_loss(num_classes=2, feat_dim=2).cuda()
+
 def transfer_classification(config):
     ## set pre-process
     prep_dict = {}
@@ -257,10 +258,6 @@ def transfer_classification(config):
     schedule_param = optimizer_config["lr_param"]
     lr_scheduler = lr_schedule.schedule_dict[optimizer_config["lr_type"]]
 
-
-
-
-
     ## train
     len_train_source = len(dset_loaders["source"]["train"]) - 1
     len_train_target = len(dset_loaders["target"]["train"]) - 1
@@ -291,11 +288,11 @@ def transfer_classification(config):
             bottleneck_layer.train(True)
         classifier_layer.train(True)
         optimizer = lr_scheduler(param_lr, optimizer, i, **schedule_param)
-        optimzer4center = optim.SGD(lmcl_loss.parameters(), lr=0.05)
-        sheduler_4center = lr_scheduler_torch.StepLR(optimizer, 20, gamma=0.5)
+        # optimzer4center = optim.SGD(lmcl_loss.parameters(), lr=0.05)
+        # sheduler_4center = lr_scheduler_torch.StepLR(optimizer, 20, gamma=0.5)
 
-        optimizer.zero_grad()
-        optimzer4center.zero_grad()
+        # optimizer.zero_grad()
+        # optimzer4center.zero_grad()
 
         if i % len_train_source == 0:
             iter_source = iter(dset_loaders["source"]["train"])
@@ -317,25 +314,24 @@ def transfer_classification(config):
         outputs = classifier_layer(features)
 
         #
-        logits, mlogits = lmcl_loss(outputs.narrow(0, 0, int(inputs.size(0)/2)), labels_source)
+        # logits, mlogits = lmcl_loss(outputs.narrow(0, 0, int(inputs.size(0)/2)), labels_source)
+        # classifier_loss = class_criterion(mlogits, labels_source)
 
-
-        classifier_loss = class_criterion(mlogits, labels_source)
-        # classifier_loss = class_criterion(outputs.narrow(0, 0, int(inputs.size(0)/2)), labels_source)
+        classifier_loss = class_criterion(outputs.narrow(0, 0, int(inputs.size(0)/2)), labels_source)
 
         ## switch between different transfer loss
         if loss_config["name"] == "DAN" or loss_config["name"] == "DAN_Linear":
             transfer_loss = transfer_criterion(features.narrow(0, 0, int(features.size(0)/2)), features.narrow(0, int(features.size(0)/2), int(features.size(0)/2)), **loss_config["params"])
 
-        # mmd_meter.update(transfer_loss.item(), inputs_source.size(0))
+        mmd_meter.update(transfer_loss.item(), inputs_source.size(0))
         # mmd_meter.update(transfer_loss.data[0], inputs_source.size(0))
-        # total_loss = loss_config["trade_off"] * transfer_loss + classifier_loss
-        total_loss = classifier_loss
+        total_loss = loss_config["trade_off"] * transfer_loss + classifier_loss
+        # total_loss = classifier_loss
         total_loss.backward()
         optimizer.step()
 
-        optimzer4center.step()
-        sheduler_4center.step()
+        # optimzer4center.step()
+        # sheduler_4center.step()
 
     print(args.source + '->' + args.target)
     print(F_best)
@@ -351,7 +347,7 @@ if __name__ == "__main__":
     parser.add_argument('--using_bottleneck', type=int, nargs='?', default=1, help="whether to use bottleneck")
     args = parser.parse_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
-    path = '../data/txt/'
+    path = 'data\\txt\\'
 
     config = {}
     config["num_iterations"] = 500

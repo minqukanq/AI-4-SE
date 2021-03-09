@@ -8,7 +8,6 @@ import time
 
 rs = Random()
 
-base_path = '/home/'
 save_path = '../data/img/'
 color_path = 'grb_img/'
 
