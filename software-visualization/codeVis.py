@@ -37,12 +37,6 @@ def get_FileSize(filePath):
     size = fsize/float(1024)
     return round(size,2)
 
-def get_FileSize(filePath):
-    # filePath = unicode(filePath,'utf8')
-    fsize = os.path.getsize(filePath)
-    size = fsize/float(1024)
-    return round(size,2)
-
 if __name__ == '__main__':
     for txtfile in os.listdir('../data//txt'):
         if txtfile == '.DS_Store':
